@@ -18,6 +18,6 @@ password: node-cli
 
 ### Run
 
-Generate 3000 jobs: `node producer.js Hello World`
+Generate 3000 jobs: `node new_task.js Hello World`
 
 Run Worker: `node worker.js`
