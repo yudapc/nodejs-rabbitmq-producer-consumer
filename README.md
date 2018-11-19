@@ -7,6 +7,11 @@ NodeJS - RabbitMQ. Sample Producer(Publisher) and Consumer(Worker)
 
 - Clone This repository
 
+- Create docker server RabbitMQ
+```
+docker-compose -f docker-compose.yml up
+```
+
 - Create new user as admin on RabbitMQ:
 ```
 username: node-cli
