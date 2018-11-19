@@ -1,30 +1,48 @@
 #!/usr/bin/env node
 
 var amqp = require('amqplib/callback_api');
-var url = 'amqp://node-cli:node-cli@localhost:5672'
+var url = 'amqp://node-cli:node-cli@localhost:5672';
+var queueName = 'task_queue';
+
+function executeProcess(err, conn) {
+  conn.createChannel(getMessageFromQueue);
+}
+
+function getMessageFromQueue(err, channel) {
+  channel.assertQueue(queueName, {durable: true});
+  channel.prefetch(1);
+  console.log(
+    ' [*] Waiting for messages in %s. To exit press CTRL+C',
+    queueName,
+  );
+  consumeJob(queueName, channel);
+}
+
+function consumeJob(queueName, channel) {
+  channel.consume(
+    queueName,
+    function(message) {
+      processing(message, channel);
+    },
+    {noAck: false},
+  );
+}
+
+function processing(message, channel) {
+  // TO DO
+  console.log(' [x] Received %s', message.content.toString());
+  finishTheWork(message, channel);
+}
+
+function finishTheWork(message, channel) {
+  var secs = message.content.toString().split('.').length - 1;
+  setTimeout(function() {
+    console.log(' [x] Done');
+    channel.ack(message);
+  }, secs * 1000);
+}
 
 amqp.connect(
   url,
-  function(err, conn) {
-    conn.createChannel(function(err, ch) {
-      var q = 'task_queue';
-
-      ch.assertQueue(q, {durable: true});
-      ch.prefetch(1);
-      console.log(' [*] Waiting for messages in %s. To exit press CTRL+C', q);
-      ch.consume(
-        q,
-        function(msg) {
-          var secs = msg.content.toString().split('.').length - 1;
-
-          console.log(' [x] Received %s', msg.content.toString());
-          setTimeout(function() {
-            console.log(' [x] Done');
-            ch.ack(msg);
-          }, secs * 1000);
-        },
-        {noAck: false},
-      );
-    });
-  },
+  executeProcess,
 );

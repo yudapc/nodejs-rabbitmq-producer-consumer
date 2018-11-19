@@ -1,21 +1,21 @@
 var amqp = require('amqplib/callback_api');
 var url = 'amqp://node-cli:node-cli@localhost:5672';
+var queueName = 'task_queue';
 
 function addingToQueue(err, conn) {
   conn.createChannel(sendToQueue);
   executeProcess(conn);
 }
 
-function sendToQueue(err, ch) {
+function sendToQueue(err, channel) {
   if (err) throw err;
-  var q = 'task_queue';
-  var msg = process.argv.slice(2).join(' ') || 'Hello World!';
+  var message = process.argv.slice(2).join(' ') || 'Hello World!';
 
-  for (i=0; i<=3000; i++) {
-    ch.assertQueue(q, {durable: true});
-    ch.sendToQueue(q, new Buffer(msg), {persistent: true});
+  for (i = 0; i <= 3000; i++) {
+    channel.assertQueue(queueName, {durable: true});
+    channel.sendToQueue(queueName, new Buffer(message), {persistent: true});
   }
-  console.log(" [x] Sent '%s'", msg);
+  console.log(" [x] Sent '%s'", message);
 }
 
 function executeProcess(conn) {
@@ -29,4 +29,3 @@ amqp.connect(
   url,
   addingToQueue,
 );
-
