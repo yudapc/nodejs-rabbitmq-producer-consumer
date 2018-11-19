@@ -18,11 +18,11 @@ username: node-cli
 password: node-cli
 ```
 
-- Install packages: 
+- Install packages:
 `npm install`
 
 ### Run
 
-Generate 3000 jobs: `node new_task.js Hello World`
+Generate 3000 jobs: `node new_task.js`
 
 Run Worker: `node worker.js`
